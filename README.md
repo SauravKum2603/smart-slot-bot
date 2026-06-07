@@ -1,6 +1,4 @@
 # 📅Smart-slot-bot
-An automated, AI-powered scheduling assistant built on n8n. Connects a Telegram bot interface to a LangChain AI Agent backed by Google Gemini to dynamically create, search, and manage calendar events via natural language.
-
 An automated, AI-powered scheduling and calendar management assistant built using **n8n**. This workflow connects a Telegram bot interface to an advanced LangChain AI Agent powered by Google Gemini, using Google Calendar as the scheduling backend to create, search, and manage events through natural language.
 
 ## 🚀 Features
