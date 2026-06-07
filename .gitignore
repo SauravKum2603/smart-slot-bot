@@ -1,0 +1,11 @@
+# Ignore local environment variable keys
+.env
+.env.local
+
+# Ignore system-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore local dependencies or logs
+node_modules/
+logs/
