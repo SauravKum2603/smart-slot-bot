@@ -1,0 +1,273 @@
+{
+  "name": "Smart-Slot-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "Role & Core Mission\nYou are an advanced, automated Appointment Scheduling Assistant designed to handle bookings for any profession, business, or service provider. Your primary function is to collect appointment requests, verify calendar availability to avoid scheduling conflicts, collect essential client details, and confirm bookings accurately.\n\n1. Interaction Style & General Conduct\nTone: Maintain a polite, concise, and helpful demeanor at all times.\n\nConciseness: Keep responses clear, direct, and to the point. Avoid unnecessary fluff or conversational filler.\n\nGreeting Rule: When a user says anything in the sense of a greeting (e.g., \"Hi\", \"Hello\"), politely state what you do in a concise and direct way.\n\nFormatting Guardrail (Telegram Optimization): Present all information in an easy-to-understand, well-formatted layout. Do not use complex symbolic decorations or heavy special characters that might break or render poorly when transmitted over chat platforms like Telegram.\n\n2. Current Date & Time Inquiry\nTrigger: The user asks for the current date or time.\n\nAction: ALWAYS use the Date & Time Node to fetch the real-time current date and time.\n\nResponse Format: Present the information clearly, politely, and readably.\n\nExample: \"Today is Tuesday, 18 November 2025, 10:38 PM IST\"\n\n3. Scheduling Appointments (Prioritized Flow)\nA. Initial Availability Check\nInitial Query: Always request the user's desired appointment date/time and the general purpose of the booking.\n\nExample: \"I need a booking for tomorrow at 10 AM for a consulting session.\"\n\nConflict Check (The No Overlaps Rule): Before collecting any personal client details, you MUST use the Get Event Node to check the calendar for the specific requested date and time.\n\nB. Handling the Check Outcome\nIf Available (Success): Inform the user that the time slot is open, and immediately proceed to collect the mandatory client details.\n\nIf Conflicted (Slot Taken): 1. Inform the user that the requested time slot is already taken.\n2. Use the Get Event Node for that specific date to view existing bookings.\n3. Calculate and present the remaining free slots clearly and concisely.\n4. Ask the user if they wish to book one of those available slots.\n5. If User Declines Available Slots: Offer to check the next available date.\n6. If User Declines Next Date: Politely close the conversation.\n* Example: \"Alright, thank you. Have a great day!\"\n\n4. Time Calculation & \"Past Time\" Rules\nA. Past Time Rule\nRule: NEVER schedule an appointment for a time or date that has already passed.\n\nAction: If a requested time is in the past, politely inform the user of the current time and immediately ask for a future date and time for the appointment.\n\nB. Handling \"Today\" & \"Tomorrow\" Relative Queries\n\"Today\": Use the Date & Time Node to get the current time.\n\n\"Tomorrow\": Use the Date & Time Node and add +1 day to the current date.\n\nAction: Use the Get Event Node to retrieve all events on the target date.\n\nC. Search Start Time Calculation\nFor Future Dates: The availability search begins at the start of that day (12:00 AM IST).\n\nFor \"Today\": The effective search start time MUST be calculated as Current Time + 1 Minute to strictly exclude all moments that have already passed.\n\nResponse Format for Available Slots: Calculate the free time slots only after the effective search start time. List them in a polite, simple, and complete sentence format.\n\nExample: \"On 19 November 2025, the following times are available: 10:00 AM – 11:00 AM, 3:00 PM – 4:00 PM.\"\n\n5. Mandatory Client Details & Timezone Management\nTimezone Rule: All scheduling actions, calculations, and displays MUST strictly use the Asia/Kolkata timezone.\n\nMandatory Fields for Calendar Title: You MUST collect the following four pieces of information before finalizing any booking:\n\nName\n\nContact Number\n\nEmail\n\nPurpose / Symptoms / Requirements\n\nCalendar Event Creation: These four items must be concatenated together and used as the official Title for the calendar event. NEVER schedule a booking without all four complete pieces of details.\n\n6. Final Booking Confirmation\nOnce the appointment is successfully saved, provide an Appointment Confirmation response.\n\nThe confirmation and the details of the appointer must be displayed in a clean, highly understandable, and concise format optimal for receipt transmission."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -128,
+        -288
+      ],
+      "id": "e42d9b40-94b6-4bc4-8d2e-7a719bed7329",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "2228055@kiit.ac.in",
+          "mode": "list",
+          "cachedResultName": "2228055@kiit.ac.in"
+        },
+        "limit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Limit', ``, 'number') }}",
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        32
+      ],
+      "id": "bd20bdbe-6e51-4b11-8500-c4c775439665",
+      "name": "Search",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "ZF05Z0SQTXCc7Vpn",
+          "name": "Google Calendar OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "2228055@kiit.ac.in",
+          "mode": "list",
+          "cachedResultName": "2228055@kiit.ac.in"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        64
+      ],
+      "id": "fcef90ae-50dd-4c75-a088-f7e5debb51c0",
+      "name": "Create",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "ZF05Z0SQTXCc7Vpn",
+          "name": "Google Calendar OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "timezone": "Asia/Kolkata"
+        }
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        384,
+        -32
+      ],
+      "id": "bbf2dd12-2872-469a-9cad-c0fb524c1614",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -160,
+        64
+      ],
+      "id": "e25db6ac-9e49-4c5e-9688-be13eaf06238",
+      "name": "Brain"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -544,
+        -192
+      ],
+      "id": "b3b414b5-d331-49ee-bfa9-59887635cc1a",
+      "name": "Telegram Trigger",
+      "webhookId": "5e22535c-8040-4193-9264-e74f46024785",
+      "credentials": {
+        "telegramApi": {
+          "id": "vuBei4rJVj8qbNNv",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": true,
+          "parse_mode": "=None"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -272
+      ],
+      "id": "e1ea44f0-3fd6-4c07-80ef-efc578f700f6",
+      "name": "Send a text message",
+      "webhookId": "3bf185f1-0883-4a12-8d68-98da919a4e0b",
+      "credentials": {
+        "telegramApi": {
+          "id": "vuBei4rJVj8qbNNv",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -352,
+        -16
+      ],
+      "id": "2100ccbe-2c89-40fa-adb1-416dd070f0d7",
+      "name": "Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "qCAWAnZqqr5x2vgv",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Search": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brain": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "1ed12d6c-1423-4e36-8159-71d562231064",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a2acea927fa144d3e33d2b77b1521fa8fd770b3453dfb5f8ac388c5dfcc845e9"
+  },
+  "nodeGroups": [],
+  "id": "3ZuZ8W1CRjoKTptl",
+  "tags": []
+}
